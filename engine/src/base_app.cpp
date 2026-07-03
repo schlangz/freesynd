@@ -129,7 +129,7 @@ bool BaseApp::initialize() {
             context_->deactivateTestFlag();
         }
 
-        system_->initialize(context_->isFullScreen());
+        system_->initialize(context_->isFullScreen(), context_->getWindowWidth(), context_->getWindowHeight());
 
         menus_.initialize(isLoadIntroResources());
 
@@ -213,6 +213,16 @@ int BaseApp::run() {
     while (running_) {
         uint32_t curtick = system_->getTicks();
         uint32_t diff_ticks = curtick - lasttick;
+        // Windows blocks the whole loop while the user is interactively
+        // dragging a window edge to resize it (it runs its own modal message
+        // loop for the duration of the drag). Without a clamp, the elapsed
+        // time reported on the first tick after such a pause can be several
+        // seconds, which desyncs any timer-driven animation/transition logic
+        // (e.g. FLI playback) that assumes elapsed time stays reasonably
+        // small between ticks.
+        if (diff_ticks > 100) {
+            diff_ticks = 100;
+        }
         menus_.updtSinceMouseDown(diff_ticks);
 
         FS_Event fsEvt;

@@ -55,7 +55,7 @@ public:
     ~SystemSDL();
 
     //! Initialize the SDL resources
-    void initialize(bool fullscreen) override;
+    void initialize(bool fullscreen, int windowWidth, int windowHeight) override;
     //! @copydoc System::showError()
     void showError(const char *errorMsg) override;
     bool clearScreen() override;
@@ -96,6 +96,8 @@ public:
     void hideCursor() override;
     void showCursor() override;
     void warpMouseToCenter() override;
+    void toggleFullscreen() override;
+    void toggleMouseGrab() override;
     void setRelativeMouseMode(bool enabled) override;
     void warpMouseTo(int gameX, int gameY) override;
     void getLastMouseRelDelta(float &xrel, float &yrel) const override;
@@ -127,7 +129,7 @@ public:
 
 protected:
     //! Creates a SDL window either for fullscreen or not
-    SDL_Window * createWindow(bool fullscreen);
+    SDL_Window * createWindow(bool fullscreen, int windowWidth, int windowHeight);
     //! Loads the graphic file that contains the cursor sprites.
     bool loadCursorSprites();
 

@@ -62,6 +62,15 @@ public:
     //! Sets the sound volume parameter to the given value in the config file
     void updateSoundVolume(int volume);
 
+    //! Return the configured window width, in pixels
+    int getWindowWidth() { return windowWidth_; }
+    //! Return the configured window height, in pixels
+    int getWindowHeight() { return windowHeight_; }
+    //! Sets the window width/height parameters to the given values in user.conf
+    void updateWindowSize(int width, int height);
+    //! Sets the fullscreen parameter to the given value in user.conf
+    void updateFullscreen(bool fullscreen);
+
     uint32_t getTimeForClick() { return time_for_click_; }
 
     fs_eng::FS_Lang currLanguage(void) {return curr_language_; }
@@ -92,6 +101,10 @@ private:
     int soundVolume_;
     //! Forced integer scale factor for gameplay (0 = auto-calculate from window size)
     int scaleFactor_;
+    //! Window width in pixels, used when not fullscreen.
+    int windowWidth_;
+    //! Window height in pixels, used when not fullscreen.
+    int windowHeight_;
 };
 
 }

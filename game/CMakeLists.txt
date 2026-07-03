@@ -146,21 +146,33 @@ elseif (WIN32)
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/FreeSynd"
     )
 
-    # Runtime DLLs live in the target sysroot bin, not the host compiler bin.
-    # MINGW_PREFIX and MINGW_TRIPLE are defined in cmake/toolchain-mingw64.cmake.
-    set(MINGW_RUNTIME_DIR "${MINGW_PREFIX}/${MINGW_TRIPLE}/bin")
+    if (MINGW)
+        # Runtime DLLs live in the target sysroot bin, not the host compiler bin.
+        # MINGW_PREFIX and MINGW_TRIPLE are defined in cmake/toolchain-mingw64.cmake.
+        set(MINGW_RUNTIME_DIR "${MINGW_PREFIX}/${MINGW_TRIPLE}/bin")
 
-    add_custom_command(TARGET freesynd POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-                "${CMAKE_SOURCE_DIR}/extern/sdl2/lib/${FREESYND_ARCH}/SDL2.dll"
-                "${CMAKE_SOURCE_DIR}/extern/SDL2_image/lib/${FREESYND_ARCH}/SDL2_image.dll"
-                "${CMAKE_SOURCE_DIR}/extern/SDL2_mixer/lib/${FREESYND_ARCH}/SDL2_mixer.dll"
-                "${MINGW_RUNTIME_DIR}/libgcc_s_seh-1.dll"
-                "${MINGW_RUNTIME_DIR}/libstdc++-6.dll"
-                "${MINGW_RUNTIME_DIR}/libwinpthread-1.dll"
-                "$<TARGET_FILE_DIR:freesynd>"
-        COMMENT "Copying SDL2 and MinGW runtime DLLs next to FreeSynd.exe"
-        VERBATIM)
+        add_custom_command(TARGET freesynd POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+                    "${CMAKE_SOURCE_DIR}/extern/sdl2/lib/${FREESYND_ARCH}/SDL2.dll"
+                    "${CMAKE_SOURCE_DIR}/extern/SDL2_image/lib/${FREESYND_ARCH}/SDL2_image.dll"
+                    "${CMAKE_SOURCE_DIR}/extern/SDL2_mixer/lib/${FREESYND_ARCH}/SDL2_mixer.dll"
+                    "${MINGW_RUNTIME_DIR}/libgcc_s_seh-1.dll"
+                    "${MINGW_RUNTIME_DIR}/libstdc++-6.dll"
+                    "${MINGW_RUNTIME_DIR}/libwinpthread-1.dll"
+                    "$<TARGET_FILE_DIR:freesynd>"
+            COMMENT "Copying SDL2 and MinGW runtime DLLs next to FreeSynd.exe"
+            VERBATIM)
+    else ()
+        # MSVC doesn't need the MinGW runtime DLLs, only the vendored SDL2 ones.
+        add_custom_command(TARGET freesynd POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+                    "${CMAKE_SOURCE_DIR}/extern/sdl2/lib/${FREESYND_ARCH}/SDL2.dll"
+                    "${CMAKE_SOURCE_DIR}/extern/SDL2_image/lib/${FREESYND_ARCH}/SDL2_image.dll"
+                    "${CMAKE_SOURCE_DIR}/extern/SDL2_mixer/lib/${FREESYND_ARCH}/SDL2_mixer.dll"
+                    "$<TARGET_FILE_DIR:freesynd>"
+            COMMENT "Copying SDL2 runtime DLLs next to FreeSynd.exe"
+            VERBATIM)
+    endif ()
 
     add_custom_command(TARGET freesynd POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E rm -rf "$<TARGET_FILE_DIR:freesynd>/data"
@@ -168,9 +180,6 @@ elseif (WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
                 "${CMAKE_SOURCE_DIR}/data/cursors"
                 "$<TARGET_FILE_DIR:freesynd>/data/cursors"
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-                "${CMAKE_SOURCE_DIR}/data/data"
-                "$<TARGET_FILE_DIR:freesynd>/data"
         COMMAND ${CMAKE_COMMAND} -E copy_directory
                 "${CMAKE_SOURCE_DIR}/data/lang"
                 "$<TARGET_FILE_DIR:freesynd>/data/lang"

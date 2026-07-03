@@ -39,6 +39,8 @@ AppContext::AppContext() {
     language_ = NULL;
     soundVolume_ = 0;
     scaleFactor_ = 0;
+    windowWidth_ = fs_eng::kScreenWidth * 2;
+    windowHeight_ = fs_eng::kScreenWidth * 3 / 2;
 }
 
 AppContext::~AppContext() {
@@ -125,6 +127,14 @@ void AppContext::readOrCreateUserConf(const std::string& userConfFolder) {
     test_files_ = userConf.read("test_data", true);
     soundVolume_ = userConf.read("sound_volume", 100);
     scaleFactor_ = userConf.read("scale_factor", 0);
+    windowWidth_ = userConf.read("window_width", windowWidth_);
+    if (windowWidth_ <= 0) {
+        windowWidth_ = fs_eng::kScreenWidth * 2;
+    }
+    windowHeight_ = userConf.read("window_height", windowHeight_);
+    if (windowHeight_ <= 0) {
+        windowHeight_ = fs_eng::kScreenWidth * 3 / 2;
+    }
     const int languageID = userConf.read("language", 0);
     std::string defaultDir;
     fs_utl::File::getDefaultSaveFolder(defaultDir);
@@ -140,6 +150,8 @@ void AppContext::readOrCreateUserConf(const std::string& userConfFolder) {
         userConf.add("language", languageID);
         userConf.add("save_data_dir", saveDataDir);
         userConf.add("sound_volume", soundVolume_);
+        userConf.add("window_width", windowWidth_);
+        userConf.add("window_height", windowHeight_);
 
         if (!updateUserConf(userConf, userConfFullpath)) {
             throw InitializationFailedException(std::format("Failed to update user configuration in folder: {}", userConfFullpath.string()));
@@ -267,6 +279,44 @@ void AppContext::updateSoundVolume(int volume) {
     LOG(Log::k_FLG_IO, "AppContext", "updateSoundVolume", ("Updating sound volume to %d in %s", volume, userConfPath.c_str()))
     ConfigFile conf(userConfPath.string());
     conf.add("sound_volume", volume);
+
+    updateUserConf(conf, userConfPath);
+}
+
+/*!
+ * Update the window_width/window_height parameters in user.conf.
+ * @param width new window width. Must be greater than zero
+ * @param height new window height. Must be greater than zero
+ */
+void AppContext::updateWindowSize(int width, int height) {
+    if (width <= 0 || height <= 0) {
+        return;
+    }
+    windowWidth_ = width;
+    windowHeight_ = height;
+
+    std::filesystem::path userConfPath;
+    fs_utl::File::getUserConfFullPath(userConfPath);
+    LOG(Log::k_FLG_IO, "AppContext", "updateWindowSize", ("Updating window size to %dx%d in %s", width, height, userConfPath.c_str()))
+    ConfigFile conf(userConfPath.string());
+    conf.add("window_width", windowWidth_);
+    conf.add("window_height", windowHeight_);
+
+    updateUserConf(conf, userConfPath);
+}
+
+/*!
+ * Update the fullscreen parameter in the config file
+ * @param fullscreen new fullscreen preference
+ */
+void AppContext::updateFullscreen(bool fullscreen) {
+    fullscreen_ = fullscreen;
+
+    std::filesystem::path userConfPath;
+    fs_utl::File::getUserConfFullPath(userConfPath);
+    LOG(Log::k_FLG_IO, "AppContext", "updateFullscreen", ("Updating fullscreen to %d in %s", fullscreen, userConfPath.c_str()))
+    ConfigFile conf(userConfPath.string());
+    conf.add("fullscreen", fullscreen_);
 
     updateUserConf(conf, userConfPath);
 }

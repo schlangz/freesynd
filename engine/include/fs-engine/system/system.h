@@ -92,7 +92,8 @@ public:
 
     virtual ~System() {}
 
-    virtual void initialize(bool fullscreen) = 0;
+    //! Initializes the system. windowWidth/windowHeight are used only when not fullscreen.
+    virtual void initialize(bool fullscreen, int windowWidth, int windowHeight) = 0;
 
     // Display an error message in a visible way for the user
     virtual void showError(const char *errorMsg) = 0;
@@ -157,6 +158,12 @@ public:
     //! Warps the mouse pointer to the centre of the game viewport and discards
     //! the synthetic motion event that SDL generates for the warp.
     virtual void warpMouseToCenter() {}
+    //! Toggle between windowed and fullscreen mode (e.g. bound to Alt+Enter).
+    virtual void toggleFullscreen() {}
+    //! Toggle whether the mouse cursor is confined to the game window (e.g.
+    //! bound to Ctrl+Shift), so it can't wander onto another monitor/desktop
+    //! mid-game, with an escape hatch to temporarily release it.
+    virtual void toggleMouseGrab() {}
     //! Enable or disable SDL relative mouse mode for smooth panning.
     //! In relative mode the OS cursor is locked in place and motion events
     //! carry raw deltas unaffected by screen edges or platform dock friction.
