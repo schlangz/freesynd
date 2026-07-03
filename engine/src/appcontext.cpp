@@ -130,11 +130,11 @@ void AppContext::readOrCreateUserConf(const std::string& userConfFolder) {
     soundVolume_ = userConf.read("sound_volume", 100);
     scaleFactor_ = userConf.read("scale_factor", 0);
     windowWidth_ = userConf.read("window_width", windowWidth_);
-    if (windowWidth_ <= 0) {
+    if (windowWidth_ < fs_eng::kScreenWidth) {
         windowWidth_ = fs_eng::kScreenWidth * 2;
     }
     windowHeight_ = userConf.read("window_height", windowHeight_);
-    if (windowHeight_ <= 0) {
+    if (windowHeight_ < fs_eng::kScreenHeight) {
         windowHeight_ = fs_eng::kScreenWidth * 3 / 2;
     }
     const int languageID = userConf.read("language", 0);
@@ -291,7 +291,7 @@ void AppContext::updateSoundVolume(int volume) {
  * @param height new window height. Must be greater than zero
  */
 void AppContext::updateWindowSize(int width, int height) {
-    if (width <= 0 || height <= 0) {
+    if (width < fs_eng::kScreenWidth || height < fs_eng::kScreenHeight) {
         return;
     }
     windowWidth_ = width;

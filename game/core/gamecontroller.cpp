@@ -25,6 +25,8 @@
 
 #include "core/gamecontroller.h"
 
+#include <algorithm>
+#include <cctype>
 #include <list>
 
 #include "fs-utils/log/log.h"
@@ -93,7 +95,13 @@ bool GameController::reset() {
  *
  * \param name The name of a cheat code.
  */
-void GameController::setCheatCode(const char *name) {
+void GameController::setCheatCode(const char *rawName) {
+    // The menu font only has uppercase glyphs, so a typed name is visually
+    // indistinguishable regardless of case: match cheat codes case-insensitively.
+    std::string upperName(rawName);
+    std::transform(upperName.begin(), upperName.end(), upperName.begin(),
+                   [](unsigned char c) { return std::toupper(c); });
+    const char *name = upperName.c_str();
 
     // Repeat mission with previously obtained items, press 'C' or 'Ctrl-C'
     // to instantly complete a mission
@@ -148,6 +156,10 @@ void GameController::change_user_infos(const char *company_name, const char *pla
     g_Session.setUserName(player_name);
     g_Session.setLogo(new_logo);
     g_Session.setLogoColour(new_color);
+
+    // Classic Syndicate easter egg: typing one of the cheat codes as the
+    // company name activates it, same as the --cheat command line option.
+    setCheatCode(company_name);
 }
 
 /*!

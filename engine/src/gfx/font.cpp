@@ -238,6 +238,12 @@ int Font::textHeight(bool x2) {
  *
  */
 bool Font::isPrintable(utf8::utfchar32_t codePoint) {
+    // Space doesn't need a glyph in the font's sprite range: drawText() and
+    // textWidth() already special-case it by just advancing the cursor.
+    if (codePoint == 0x0020) {
+        return true;
+    }
+
     // We look for the corresponding character in cp437 table
     if (codePoint > sizeof(unicodeToCp437)) {
         return false; // out-of-range
