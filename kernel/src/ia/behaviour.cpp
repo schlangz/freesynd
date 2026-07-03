@@ -389,6 +389,7 @@ PanicComponent::PanicComponent():
         BehaviourComponent(), scoutTimer_(500) {
     backFromPanic_ = false;
     status_ = kPanicStatusCalm;
+    pArmedPed_ = nullptr;
     // this component will be activated by event to
     // lower CPU consumption
     setEnabled(false);
