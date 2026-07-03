@@ -219,6 +219,14 @@ void GameSession::cheatEnableAllMission() {
     }
 }
 
+void GameSession::cheatOwnAllCountries() {
+    for (int i=0; i<NB_MISSION; i++) {
+        g_Blocks[i].status = BLK_FINISHED;
+        g_Blocks[i].popStatus = STAT_VERY_HAPPY;
+        g_Blocks[i].syndicate_owner = 0;
+    }
+}
+
 /*!
  * Returns the revenue of the given tax rate on the given population.
  * \param population The population number

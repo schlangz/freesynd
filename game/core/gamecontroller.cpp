@@ -69,7 +69,6 @@ bool GameController::reset() {
     // Reset default mods and weapons
     mods_.reset();
     weaponMgr_.reset();
-    // TODO add reading cheatcode for onlywomen parameter
     agents_.reset();
 
     // Reset user session
@@ -507,11 +506,40 @@ void GameController::cheatAnyMission() {
 }
 
 void GameController::cheatResurrectAgents() {
-    // TODO: Implement cheatResurrectAgents()
+    // Top up the roster back to its original starting size of 8, replacing
+    // any agent lost to death in a mission.
+    uint8_t nbAgents = 0;
+    for (uint8_t i = 0; i < fs_knl::AgentManager::MAX_AGENT; i++) {
+        if (agents().agent(i) != nullptr) {
+            nbAgents++;
+        }
+    }
+
+    while (nbAgents < 8) {
+        fs_knl::Agent *pAgent = agents().createAgent();
+        if (!pAgent) {
+            break;
+        }
+        pAgent->addWeapon(fs_knl::WeaponInstance::createInstance(weaponManager().getWeapon(fs_knl::Weapon::Pistol)));
+        nbAgents++;
+    }
+
+    // Fill any empty squad slot with an agent not already assigned to the squad
+    for (uint8_t slot = 0; slot < fs_knl::Squad::kMaxSlot; slot++) {
+        if (agents().squadMember(slot) == nullptr) {
+            for (uint8_t i = 0; i < fs_knl::AgentManager::MAX_AGENT; i++) {
+                fs_knl::Agent *pAgent = agents().agent(i);
+                if (pAgent && agents().getSquadSlotForAgent(pAgent) == fs_knl::Squad::kMaxSlot) {
+                    agents().setSquadMember(slot, pAgent);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 void GameController::cheatOwnAllCountries() {
-    // TODO: Implement cheatOwnAllCountries()
+    g_Session.cheatOwnAllCountries();
 }
 
 void GameController::cheatAccelerateTime() {

@@ -230,6 +230,9 @@ public:
     //! Cheat method to enable all missions
     void cheatEnableAllMission();
 
+    //! Cheat method to make the player own every country
+    void cheatOwnAllCountries();
+
     //! Cheat method to replay finished mission
     void cheatReplayMission() { replay_mission_ = true; }
 
