@@ -51,6 +51,16 @@ if (APPLE AND "${SDL_INCLUDE_DIR}" MATCHES ".framework")
 	set (SOURCES ${SOURCES} SDLMain.m)
 endif()
 
+if (WIN32)
+	# Embed the app icon as a Win32 resource so the exe/taskbar show it.
+	set(FREESYND_ICON_PATH "${CMAKE_SOURCE_DIR}/packaging/icon/sword.ico")
+	configure_file(
+		"${CMAKE_CURRENT_SOURCE_DIR}/resources/freesynd.rc.in"
+		"${CMAKE_CURRENT_BINARY_DIR}/freesynd.rc"
+		@ONLY)
+	set (SOURCES ${SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/freesynd.rc")
+endif()
+
 set(HEADERS
     version.h
 	app.h
