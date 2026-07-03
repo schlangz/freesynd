@@ -54,6 +54,10 @@ public:
     int getSoundVolume() { return soundVolume_; }
     //! Return the forced scale factor (0 = auto-calculate)
     int getScaleFactor() { return scaleFactor_; }
+    //! True means menu screens only scale at whole multiples of the base
+    //! resolution (classic pixel-perfect look); false means they scale
+    //! continuously to fill the window at any size.
+    bool isMenuIntegerScaling() { return menuIntegerScaling_; }
 
     //! Sets the intro flag to false in the config file
     void updateIntroFlag();
@@ -92,6 +96,9 @@ private:
      * if it will be longer it will be treated as dragging
     */
     uint32_t time_for_click_;
+    /*! True means menu screens only scale at whole multiples of the base
+     * resolution; false means they scale continuously.*/
+    bool menuIntegerScaling_;
     /*! True means data files will be verified.*/
     bool test_files_{};
     /*! Language file. */

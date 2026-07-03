@@ -34,6 +34,7 @@ namespace fs_eng {
 
 AppContext::AppContext() {
     time_for_click_ = 80;
+    menuIntegerScaling_ = false;
     fullscreen_ = false;
     playIntro_ = true;
     language_ = NULL;
@@ -76,6 +77,7 @@ void AppContext::readFreesyndIni(const std::string& iniFolder) {
     }
 
     time_for_click_ = freesyndIni.read("time_for_click", 80u);
+    menuIntegerScaling_ = freesyndIni.read("menu_integer_scaling", false);
 
     std::string freesynDataDir;
     if (freesyndIni.readInto(freesynDataDir, "freesynd_data_dir")) {

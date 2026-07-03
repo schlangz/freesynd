@@ -264,14 +264,24 @@ void SystemSDL::calculateGameViewport() {
         gameWidth_  = fs_eng::kScreenWidth;
         gameHeight_ = fs_eng::kScreenHeight;
         int targetH = fs_eng::kScreenWidth * 3 / 4; // 480
-        // Scale continuously (not just at integer multiples) so the menu
-        // fills as much of the window as possible at any size, preserving
-        // the 4:3-equivalent aspect ratio and centering the remainder.
-        float scale = std::min(static_cast<float>(winW) / fs_eng::kScreenWidth,
-                                static_cast<float>(winH) / targetH);
-        if (scale <= 0.0f) scale = 1.0f;
-        int scaledW = static_cast<int>(fs_eng::kScreenWidth * scale);
-        int scaledH = static_cast<int>(targetH * scale);
+        int scaledW, scaledH;
+        if (g_Ctx.isMenuIntegerScaling()) {
+            // Classic pixel-perfect scaling: only scale at whole multiples of
+            // the base resolution, so there's no non-integer stretching blur.
+            int n = std::min(winW / fs_eng::kScreenWidth, winH / targetH);
+            if (n < 1) n = 1;
+            scaledW = n * fs_eng::kScreenWidth;
+            scaledH = n * targetH;
+        } else {
+            // Scale continuously (not just at integer multiples) so the menu
+            // fills as much of the window as possible at any size, preserving
+            // the 4:3-equivalent aspect ratio and centering the remainder.
+            float scale = std::min(static_cast<float>(winW) / fs_eng::kScreenWidth,
+                                    static_cast<float>(winH) / targetH);
+            if (scale <= 0.0f) scale = 1.0f;
+            scaledW = static_cast<int>(fs_eng::kScreenWidth * scale);
+            scaledH = static_cast<int>(targetH * scale);
+        }
         viewportRect_ = {(winW - scaledW) / 2, (winH - scaledH) / 2, scaledW, scaledH};
     }
 }
